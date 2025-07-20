@@ -1,0 +1,43 @@
+---
+globs: **/lib/data.ts,**/api/**/*.ts,scripts/*.ts
+---
+
+# Database Operations with Prisma
+
+## Core Patterns
+
+### Always import Prisma client from lib
+```typescript
+import { prisma } from '@/lib/prisma'
+```
+
+### Standard CRUD Operations
+- Use the data access functions from [src/lib/data.ts](mdc:src/lib/data.ts)
+- For posts: `getPosts()`, `getPostById()`, `createPost()`
+- For comments: `getCommentsByPostId()`, `addComment()`
+
+### Query Patterns
+```typescript
+// Always include proper relations
+const comments = await prisma.comment.findMany({
+  where: { postId },
+  include: {
+    user: {
+      select: { name: true, email: true, image: true }
+    }
+  },
+  orderBy: { createdAt: 'asc' }
+})
+```
+
+### Error Handling
+- Always wrap database operations in try-catch
+- Return appropriate HTTP status codes in API routes
+- Log errors for debugging: `console.error('Error:', error)`
+
+### Available npm Scripts
+- `npm run db:generate` - Generate Prisma client
+- `npm run db:migrate` - Run database migrations
+- `npm run db:seed` - Initialize seed data
+- `npm run db:studio` - Open Prisma Studio
+- `npm run db:reset` - Reset database

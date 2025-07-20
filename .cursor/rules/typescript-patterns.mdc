@@ -1,0 +1,61 @@
+---
+globs: **/*.ts,**/*.tsx
+---
+
+# TypeScript Patterns for Blog Project
+
+## Type Definitions
+All types defined in [src/types/index.ts](mdc:src/types/index.ts):
+
+```typescript
+export interface Post {
+  id: string
+  title: string
+  content: string
+  excerpt: string
+  author: string
+  userId?: string | null
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface Comment {
+  id: string
+  postId: string
+  content: string
+  author: Author
+  userId: string
+  createdAt: Date
+}
+```
+
+## Import Patterns
+```typescript
+// Types
+import { Post, Comment } from '@/types'
+
+// Components
+import { ComponentName } from '@/components/ComponentName'
+
+// Utilities
+import { auth } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+import { getPosts, getPostById } from '@/lib/data'
+```
+
+## Component Props Typing
+```typescript
+interface ComponentProps {
+  post: Post
+  index?: number
+}
+
+export default function Component({ post, index }: ComponentProps) {
+  // Component logic
+}
+```
+
+## Async Function Returns
+- Data functions should return Promise<Type[]> or Promise<Type | null>
+- API functions should return NextResponse
+- Always handle null/undefined cases with proper type guards

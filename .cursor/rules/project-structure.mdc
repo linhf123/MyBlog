@@ -1,0 +1,32 @@
+---
+alwaysApply: true
+---
+
+# Blog Project Structure Guide
+
+This is a Next.js 15 blog project with PostgreSQL backend. Key architectural patterns:
+
+## Core Structure
+- Entry point: [src/app/page.tsx](mdc:src/app/page.tsx) - Homepage with article list
+- Global layout: [src/app/layout.tsx](mdc:src/app/layout.tsx) - Root layout with navigation
+- Database schema: [prisma/schema.prisma](mdc:prisma/schema.prisma) - PostgreSQL models
+
+## Key Directories
+- `src/app/api/` - API routes (posts, comments, auth)
+- `src/components/` - Reusable React components
+- `src/lib/` - Utility libraries (auth, data access, Prisma client)
+- `src/types/` - TypeScript type definitions
+- `scripts/` - Database seeding and utility scripts
+
+## Data Flow
+1. Database operations go through [src/lib/data.ts](mdc:src/lib/data.ts)
+2. Prisma client configured in [src/lib/prisma.ts](mdc:src/lib/prisma.ts)
+3. Authentication handled by [src/lib/auth.ts](mdc:src/lib/auth.ts)
+4. API routes in `src/app/api/` connect frontend to data layer
+
+## Key Features
+- GitHub OAuth authentication via NextAuth.js
+- PostgreSQL + Prisma ORM
+- Responsive design with Tailwind CSS
+- Server-side rendering with App Router
+- Comment system for authenticated users

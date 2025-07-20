@@ -1,0 +1,56 @@
+---
+globs: **/api/**/*.ts
+---
+
+# API Route Patterns
+
+## Standard Structure
+All API routes should follow this pattern:
+
+```typescript
+import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@/lib/auth'
+import { dataFunction } from '@/lib/data'
+
+export async function GET(request: NextRequest) {
+  try {
+    // Extract parameters
+    const searchParams = request.nextUrl.searchParams
+    const id = searchParams.get('id')
+    
+    // Validate parameters
+    if (!id) {
+      return NextResponse.json({ error: 'ID is required' }, { status: 400 })
+    }
+    
+    // Call data function
+    const result = await dataFunction(id)
+    
+    return NextResponse.json(result)
+  } catch (error) {
+    console.error('Error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
+```
+
+## Authentication Required Routes
+For routes requiring authentication:
+
+```typescript
+export async function POST(request: NextRequest) {
+  const session = await auth()
+  
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  
+  // Continue with authenticated logic
+}
+```
+
+## Existing API Routes
+- `/api/posts` - Get all posts
+- `/api/posts/[id]` - Get single post
+- `/api/comments` - Get/Post comments (requires postId)
+- `/api/auth/[...nextauth]` - NextAuth.js endpoints

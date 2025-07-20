@@ -1,0 +1,47 @@
+---
+globs: **/api/**/*.ts,**/lib/auth.ts,**/components/**/*.tsx
+---
+
+# Authentication Patterns with NextAuth.js
+
+## Configuration
+- Auth config in [src/lib/auth.ts](mdc:src/lib/auth.ts)
+- Uses GitHub OAuth provider
+- PrismaAdapter for database sessions
+- Session callback adds user.id to session
+
+## Usage Patterns
+
+### Server-side Authentication
+```typescript
+import { auth } from '@/lib/auth'
+
+export async function POST(request: NextRequest) {
+  const session = await auth()
+  
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  
+  // Use session.user.id for database operations
+}
+```
+
+### Client-side Session
+```typescript
+// Use SessionProvider wrapper in components
+import { SessionProvider } from '@/components/SessionProvider'
+```
+
+## Required Environment Variables
+```env
+GITHUB_CLIENT_ID=your_github_client_id
+GITHUB_CLIENT_SECRET=your_github_client_secret
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your_nextauth_secret
+```
+
+## Database Schema
+- Uses NextAuth.js required tables: User, Account, Session, VerificationToken
+- Custom fields: User.createdAt, User.updatedAt for blog functionality
+- Relations: User -> Post[], User -> Comment[]
