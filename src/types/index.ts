@@ -4,7 +4,7 @@ export interface Post {
   content: string;
   excerpt: string;
   author: string;
-  userId?: string; // Optional link to User
+  userId?: string | null; // Optional link to User
   createdAt: Date;
   updatedAt: Date;
 }
@@ -18,7 +18,7 @@ export interface Comment {
     email: string;
     image?: string;
   };
-  userId?: string; // Database user ID
+  userId: string; // Database user ID
   createdAt: Date;
 }
 

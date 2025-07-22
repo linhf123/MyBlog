@@ -1,5 +1,6 @@
 import { Post, Comment } from '@/types';
 import { prisma } from './prisma';
+import matter from 'gray-matter';
 
 // 获取所有文章
 export async function getPosts(): Promise<Post[]> {
@@ -40,7 +41,7 @@ export async function getCommentsByPostId(postId: string): Promise<Comment[]> {
   });
 
   // 转换为前端期望的格式
-  return comments.map((comment: any): Comment => ({
+  return comments.map((comment): Comment => ({
     id: comment.id,
     postId: comment.postId,
     content: comment.content,
@@ -170,4 +171,61 @@ Next.js 15 是一个重要的版本更新，为开发者提供了更好的开发
       },
     ],
   });
+}
+
+// 从 Markdown 文件创建文章
+export async function createPostFromMarkdown(
+  markdownContent: string, 
+  authorName: string, 
+  userId: string
+): Promise<Post> {
+  const { data: frontMatter, content } = matter(markdownContent);
+  
+  // 从 frontMatter 中提取元数据，如果没有则使用默认值
+  const title = frontMatter.title || extractTitleFromContent(content) || 'Untitled';
+  const excerpt = frontMatter.excerpt || frontMatter.description || generateExcerpt(content);
+  const author = frontMatter.author || authorName;
+  
+  // 验证必要字段
+  if (!title.trim()) {
+    throw new Error('文章标题不能为空');
+  }
+  
+  if (!content.trim()) {
+    throw new Error('文章内容不能为空');
+  }
+  
+  const post = await createPost({
+    title: title.trim(),
+    content: content.trim(),
+    excerpt: excerpt.trim(),
+    author: author.trim(),
+    userId
+  });
+  
+  return post;
+}
+
+// 从内容中提取标题（查找第一个 # 标题）
+function extractTitleFromContent(content: string): string | null {
+  const titleMatch = content.match(/^#\s+(.+)$/m);
+  return titleMatch ? titleMatch[1].trim() : null;
+}
+
+// 生成文章摘要（取前 150 个字符）
+function generateExcerpt(content: string): string {
+  // 移除 Markdown 语法
+  const plainText = content
+    .replace(/^#{1,6}\s+/gm, '') // 移除标题
+    .replace(/\*\*(.*?)\*\*/g, '$1') // 移除粗体
+    .replace(/\*(.*?)\*/g, '$1') // 移除斜体
+    .replace(/`(.*?)`/g, '$1') // 移除行内代码
+    .replace(/```[\s\S]*?```/g, '') // 移除代码块
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // 移除链接，保留文本
+    .replace(/\n\s*\n/g, ' ') // 移除多余换行
+    .trim();
+  
+  return plainText.length > 150 
+    ? plainText.substring(0, 150) + '...' 
+    : plainText;
 } 

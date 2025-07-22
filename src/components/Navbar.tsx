@@ -2,9 +2,33 @@
 
 import Link from 'next/link';
 import { useSession, signIn, signOut } from 'next-auth/react';
+import { useState, useEffect } from 'react';
 
 export default function Navbar() {
   const { data: session, status } = useSession();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  // 检查用户是否为管理员
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      if (session?.user) {
+        try {
+          const response = await fetch('/api/auth/check-admin');
+          const result = await response.json();
+          setIsAdmin(result.isAdmin);
+        } catch (error) {
+          console.error('Error checking admin status:', error);
+          setIsAdmin(false);
+        }
+      } else {
+        setIsAdmin(false);
+      }
+    };
+
+    if (status !== 'loading') {
+      checkAdminStatus();
+    }
+  }, [session, status]);
 
   return (
     <nav className="sticky top-0 z-50 bg-gradient-to-r from-indigo-600/95 via-purple-600/95 to-blue-600/95 backdrop-blur-xl shadow-xl border-b border-white/20">
@@ -42,9 +66,20 @@ export default function Navbar() {
                     <span className="text-indigo-100/70 text-xs">已登录</span>
                   </div>
                 </div>
+                {isAdmin && (
+                  <Link
+                    href="/admin/upload"
+                    className="flex items-center px-4 py-2 text-white hover:text-indigo-100 hover:bg-white/10 rounded-lg font-medium transition-all duration-200 border border-white/20 hover:border-white/30"
+                  >
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    上传
+                  </Link>
+                )}
                 <button
                   onClick={() => signOut()}
-                  className="px-4 py-2 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg font-medium transition-all duration-200 text-white hover:text-indigo-100 hover:bg-white/10 border border-white/20 hover:border-white/30"
+                  className="flex items-center px-4 py-2 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded-lg font-medium transition-all duration-200 text-white hover:text-indigo-100 hover:bg-white/10 border border-white/20 hover:border-white/30"
                 >
                   <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
