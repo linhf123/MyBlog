@@ -1,0 +1,15 @@
+{
+  "buildCommand": "prisma generate && npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install && prisma generate",
+  "framework": "nextjs",
+  "functions": {
+    "src/app/api/**/*.ts": {
+      "maxDuration": 30
+    }
+  },
+  "regions": ["fra1"],
+  "env": {
+    "PRISMA_CLI_BINARY_TARGETS": "native,rhel-openssl-1.0.x"
+  }
+} 
