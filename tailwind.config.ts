@@ -14,6 +14,9 @@ const config: Config = {
         'slide-in-left': 'slideInLeft 0.6s ease-out',
         'float': 'float 3s ease-in-out infinite',
         'pulse-slow': 'pulse-slow 2s infinite',
+        'digit-bounce': 'digitBounce 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+        'digit-drop-in': 'digitDropIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)',
+        'digit-drop-out': 'digitDropOut 0.5s cubic-bezier(0.55, 0.085, 0.68, 0.53)',
       },
       keyframes: {
         fadeIn: {
@@ -60,6 +63,44 @@ const config: Config = {
           },
           '50%': {
             opacity: '0.5',
+          },
+        },
+        digitBounce: {
+          '0%': {
+            transform: 'translateY(0) scale(1)',
+          },
+          '30%': {
+            transform: 'translateY(-8px) scale(1.1)',
+          },
+          '70%': {
+            transform: 'translateY(-2px) scale(1.05)',
+          },
+          '100%': {
+            transform: 'translateY(0) scale(1)',
+          },
+        },
+        digitDropIn: {
+          '0%': {
+            transform: 'translateY(-100%)',
+            opacity: '0',
+          },
+          '50%': {
+            transform: 'translateY(10%)',
+            opacity: '1',
+          },
+          '100%': {
+            transform: 'translateY(0)',
+            opacity: '1',
+          },
+        },
+        digitDropOut: {
+          '0%': {
+            transform: 'translateY(0)',
+            opacity: '1',
+          },
+          '100%': {
+            transform: 'translateY(100%)',
+            opacity: '0',
           },
         },
       },

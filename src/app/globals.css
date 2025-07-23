@@ -64,6 +64,15 @@ body {
   }
 }
 
+@keyframes digitBounce {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-3px) scale(1.05);
+  }
+}
+
 /* 渐变背景 */
 .bg-gradient-mesh {
   background: 
@@ -74,6 +83,11 @@ body {
     radial-gradient(at 0% 100%, rgb(59, 130, 246) 0px, transparent 50%),
     radial-gradient(at 80% 100%, rgb(147, 51, 234) 0px, transparent 50%),
     radial-gradient(at 0% 0%, rgb(99, 102, 241) 0px, transparent 50%);
+}
+
+/* 时间数字跳动动画 */
+.animate-digit-bounce {
+  animation: digitBounce 0.6s ease-in-out;
 }
 
 /* 工具类 */
