@@ -12,8 +12,8 @@
 ✅ DATABASE_URL
 ✅ NEXTAUTH_SECRET
 ✅ NEXTAUTH_URL
-✅ GITHUB_CLIENT_ID
-✅ GITHUB_CLIENT_SECRET
+✅ OAUTH_GITHUB_CLIENT_ID
+✅ OAUTH_GITHUB_CLIENT_SECRET
 ```
 
 ### 可选的 Secrets (2个)
@@ -21,6 +21,14 @@
 🔹 PREVIEW_DATABASE_URL  (PR预览用)
 🔹 SNYK_TOKEN           (安全扫描用)
 ```
+
+## ⚠️ 重要提醒
+
+**GitHub保留了 `GITHUB_` 前缀**，所以GitHub OAuth相关的变量必须使用不同的名称：
+- ❌ ~~GITHUB_CLIENT_ID~~ (不能使用)
+- ❌ ~~GITHUB_CLIENT_SECRET~~ (不能使用)
+- ✅ `OAUTH_GITHUB_CLIENT_ID` (正确)
+- ✅ `OAUTH_GITHUB_CLIENT_SECRET` (正确)
 
 ## 🧪 验证方法
 
@@ -58,7 +66,7 @@ git push origin test-deployment
 ## 🚨 常见错误
 
 ### "Input required and not supplied"
-- 检查 Secret 名称拼写
+- 检查 Secret 名称拼写（特别是新的OAuth变量名）
 - 确认 Secret 值不为空
 
 ### "Authentication failed"  
@@ -68,6 +76,10 @@ git push origin test-deployment
 ### "Database connection failed"
 - 验证 DATABASE_URL 格式
 - 确认数据库服务正常
+
+### "GitHub OAuth配置错误"
+- 确认使用了新的变量名称：`OAUTH_GITHUB_CLIENT_ID` 和 `OAUTH_GITHUB_CLIENT_SECRET`
+- 检查GitHub OAuth应用的回调URL设置
 
 ## 📞 获取帮助
 

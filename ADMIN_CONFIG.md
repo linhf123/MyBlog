@@ -1,130 +1,214 @@
-# 📋 管理员配置指南
+# 博客管理员配置指南
 
-## 🔧 环境变量配置
+本指南将帮助你配置博客的管理员功能，包括上传文章、管理评论等权限。
 
-为了限制文章上传权限只给管理员用户，你需要在 `.env.local` 文件中配置管理员用户。
+## 🔑 管理员权限功能
 
-### 配置方式
+- ✅ **文章上传**: 通过 `/admin/upload` 页面上传 Markdown 文件
+- ✅ **内容管理**: 管理所有文章和评论
+- ✅ **用户管理**: 查看用户信息和活动
 
-#### 方式1：通过邮箱配置（推荐）
+## 🛠 配置管理员权限
+
+### 方法1：通过邮箱配置（推荐）
+
+在环境变量中添加管理员邮箱列表：
+
+**本地开发** (`.env.local`):
+```bash
+# 管理员邮箱（多个邮箱用逗号分隔）
+ADMIN_EMAILS="admin@example.com,another@example.com"
+```
+
+**Vercel 部署环境**:
+```bash
+# 在 Vercel Dashboard → Settings → Environment Variables 中添加
+ADMIN_EMAILS="admin@example.com,another@example.com"
+```
+
+**GitHub Actions Secrets**:
+```bash
+# 在 GitHub → Settings → Secrets → Actions 中添加
+ADMIN_EMAILS="admin@example.com,another@example.com"
+```
+
+### 方法2：通过用户ID配置
+
+如果你知道GitHub用户的内部ID，也可以通过ID配置：
 
 ```bash
-# 单个管理员
-ADMIN_EMAILS="your-email@example.com"
-
-# 多个管理员（用逗号分隔）
-ADMIN_EMAILS="admin1@example.com,admin2@example.com,admin3@example.com"
+# 管理员用户ID（多个ID用逗号分隔）
+ADMIN_USER_IDS="12345678,87654321"
 ```
 
-#### 方式2：通过用户ID配置
+### 如何获取GitHub用户ID
 
-```bash
-# 单个管理员
-ADMIN_USER_IDS="clxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+1. **方法1**: 访问 `https://api.github.com/users/[username]`
+2. **方法2**: 在浏览器开发者工具中查看登录后的用户信息
+3. **方法3**: 查看数据库中的用户记录
 
-# 多个管理员（用逗号分隔）
-ADMIN_USER_IDS="clxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx,clyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy"
-```
+## 🔧 完整环境变量配置
 
-#### 方式3：混合配置
-
-```bash
-# 可以同时配置邮箱和用户ID
-ADMIN_EMAILS="admin@example.com"
-ADMIN_USER_IDS="clxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-```
-
-## 🎯 如何获取用户ID
-
-### 方法1：数据库查询
-```sql
-SELECT id, email, name FROM "User" WHERE email = 'your-email@example.com';
-```
-
-### 方法2：开发者工具
-1. 登录你的博客系统
-2. 打开浏览器开发者工具（F12）
-3. 在 Console 中输入：
-```javascript
-// 查看当前用户session
-fetch('/api/auth/session').then(r => r.json()).then(console.log)
-```
-4. 在返回的数据中找到 `user.id` 字段
-
-### 方法3：Prisma Studio
-```bash
-npx prisma studio
-```
-在 User 表中查找你的用户记录，复制 ID 字段。
-
-## 🔐 权限验证逻辑
-
-系统会检查当前登录用户是否满足以下任一条件：
-
-1. **邮箱匹配**：用户邮箱在 `ADMIN_EMAILS` 列表中
-2. **用户ID匹配**：用户ID在 `ADMIN_USER_IDS` 列表中
-
-只要满足其中一个条件，用户就具有管理员权限。
-
-## 📁 完整的 .env.local 示例
-
+### 本地开发环境 (`.env.local`)
 ```bash
 # 数据库配置
-DATABASE_URL="postgresql://username:password@localhost:5432/blog"
+DATABASE_URL="postgresql://user:password@localhost:5432/blog_db"
 
 # NextAuth.js 配置
+NEXTAUTH_SECRET="your-secret-here"
 NEXTAUTH_URL="http://localhost:3000"
-NEXTAUTH_SECRET="your-nextauth-secret-key"
 
-# GitHub OAuth 配置
+# GitHub OAuth (本地开发使用标准变量名)
 GITHUB_CLIENT_ID="your-github-client-id"
 GITHUB_CLIENT_SECRET="your-github-client-secret"
 
 # 管理员配置
-ADMIN_EMAILS="your-email@gmail.com"
+ADMIN_EMAILS="admin@example.com"
+ADMIN_USER_IDS="12345678"
 ```
 
-## 🚫 安全注意事项
-
-1. **敏感信息保护**：不要将 `.env.local` 文件提交到版本控制系统
-2. **定期检查**：定期检查管理员列表，移除不需要权限的用户
-3. **邮箱验证**：确保配置的邮箱地址是你可以控制的
-4. **最小权限原则**：只给需要上传文章的用户管理员权限
-
-## 🔄 配置更改后的操作
-
-修改环境变量后需要：
-
-1. **重启开发服务器**：
+### Vercel 生产环境
+在 Vercel Dashboard → Settings → Environment Variables 中配置：
 ```bash
-npm run dev
+DATABASE_URL="your-vercel-postgres-url"
+NEXTAUTH_SECRET="your-secret-here"
+NEXTAUTH_URL="https://your-domain.vercel.app"
+GITHUB_CLIENT_ID="your-github-client-id"
+GITHUB_CLIENT_SECRET="your-github-client-secret"
+ADMIN_EMAILS="admin@example.com"
+ADMIN_USER_IDS="12345678"
 ```
 
-2. **清除浏览器缓存**（可选）
+### GitHub Actions Secrets
+在 GitHub → Settings → Secrets and variables → Actions 中配置：
+```bash
+DATABASE_URL="your-database-url"
+NEXTAUTH_SECRET="your-secret-here"
+NEXTAUTH_URL="https://your-domain.vercel.app"
+OAUTH_GITHUB_CLIENT_ID="your-github-client-id"      # ⚠️ 注意变量名
+OAUTH_GITHUB_CLIENT_SECRET="your-github-client-secret"  # ⚠️ 注意变量名
+ADMIN_EMAILS="admin@example.com"
+ADMIN_USER_IDS="12345678"
+```
 
-3. **重新登录**验证权限
+## 🧪 测试管理员功能
 
-## 📝 测试权限配置
+### 1. 本地测试
+```bash
+# 启动开发服务器
+npm run dev
 
-1. 配置环境变量
-2. 重启服务器
-3. 登录系统
-4. 检查导航栏是否显示"上传"按钮
-5. 尝试访问 `/admin/upload` 页面
-6. 测试非管理员用户无法访问上传功能
+# 访问管理页面
+open http://localhost:3000/admin/upload
+```
 
-## ❗ 故障排除
+### 2. 验证权限
+1. 使用配置的管理员邮箱通过GitHub登录
+2. 访问 `/admin/upload` 页面
+3. 应该能看到文件上传界面
+4. 尝试上传一个 Markdown 文件
 
-### 问题：配置了邮箱但仍无权限
-- 检查邮箱拼写是否正确
-- 确认 GitHub 账号的邮箱是否与配置的邮箱一致
-- 重启开发服务器
+### 3. 检查权限API
+```bash
+# 测试权限检查接口
+curl http://localhost:3000/api/auth/check-admin
+```
 
-### 问题：找不到用户ID
-- 确保已经登录过系统（在数据库中有用户记录）
-- 使用 Prisma Studio 查看数据库中的用户记录
+## 📝 管理员功能使用
 
-### 问题：环境变量不生效
-- 检查 `.env.local` 文件是否在项目根目录
-- 确认环境变量名称拼写正确
-- 重启开发服务器 
+### 上传文章
+
+1. **访问上传页面**: `/admin/upload`
+2. **选择文件**: 支持 `.md` 和 `.txt` 文件
+3. **自动解析**: 系统会自动解析文件名、Front Matter等
+4. **发布文章**: 上传后文章会立即发布
+
+### Markdown 文件格式
+
+支持标准的Front Matter格式：
+
+```markdown
+---
+title: "文章标题"
+date: "2024-01-20"
+excerpt: "文章摘要"
+author: "作者名称"
+---
+
+# 文章内容
+
+这里是文章的正文内容...
+```
+
+### 管理文章
+
+- 通过数据库管理工具：`npm run db:studio`
+- 通过API接口进行CRUD操作
+- 未来版本将添加Web管理界面
+
+## 🔒 安全注意事项
+
+### 1. 环境变量安全
+- ✅ 切勿将敏感信息提交到代码仓库
+- ✅ 定期轮换密钥和Token
+- ✅ 使用不同的密钥用于不同环境
+
+### 2. 管理员权限控制
+- ✅ 只给必要的人员分配管理员权限
+- ✅ 定期审查管理员列表
+- ✅ 考虑使用用户ID而不是邮箱（更安全）
+
+### 3. 文件上传安全
+- ✅ 只允许 Markdown 和文本文件
+- ✅ 文件大小限制
+- ✅ 内容过滤和验证
+
+## 🛠 故障排查
+
+### Q: 无法访问管理页面
+**可能原因**:
+- 用户邮箱不在管理员列表中
+- 环境变量配置错误
+- GitHub OAuth 配置问题
+
+**解决方案**:
+```bash
+# 检查环境变量
+echo $ADMIN_EMAILS
+
+# 查看当前用户信息
+# 在浏览器控制台执行
+console.log(session.user)
+
+# 检查权限API
+curl http://localhost:3000/api/auth/check-admin
+```
+
+### Q: 文件上传失败
+**可能原因**:
+- 文件格式不支持
+- 文件大小超限
+- 权限检查失败
+
+**解决方案**:
+- 确认文件是 `.md` 或 `.txt` 格式
+- 检查文件大小（建议 < 10MB）
+- 确认已正确配置管理员权限
+
+### Q: GitHub Actions 部署后权限丢失
+**检查事项**:
+- 确认 GitHub Secrets 中配置了 `ADMIN_EMAILS`
+- 检查 Vercel 环境变量配置
+- 验证变量名使用正确（OAUTH_GITHUB_CLIENT_ID）
+
+## 📞 获取帮助
+
+如果遇到问题：
+1. 检查浏览器控制台错误信息
+2. 查看服务器日志
+3. 验证所有环境变量配置
+4. 参考 [GitHub Actions 配置指南](./scripts/setup-github-actions.md)
+
+---
+
+✨ 配置完成后，你就可以开始管理你的博客内容了！ 

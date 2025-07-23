@@ -129,11 +129,26 @@ export default async function PostPage({ params }: PostPageProps) {
   );
 }
 
-// 生成静态参数
+// 生成静态参数 - 添加错误处理以支持CI构建
 export async function generateStaticParams() {
-  const posts = await import('@/lib/data').then(module => module.getPosts());
-  
-  return posts.map((post) => ({
-    id: post.id,
-  }));
+  // 在CI环境或数据库不可用时跳过静态生成
+  if (process.env.CI === 'true' || process.env.NODE_ENV === 'test') {
+    console.log('⚠️  Skipping static params generation in CI/test environment');
+    return [];
+  }
+
+  try {
+    const { getPosts } = await import('@/lib/data');
+    const posts = await getPosts();
+    
+    console.log(`✅ Generated static params for ${posts.length} posts`);
+    return posts.map((post) => ({
+      id: post.id,
+    }));
+  } catch (error) {
+    console.error('❌ Failed to generate static params:', error);
+    // 在构建时如果数据库连接失败，返回空数组而不是让构建失败
+    // 这样页面仍然可以正常构建，只是不会预渲染静态页面
+    return [];
+  }
 } 

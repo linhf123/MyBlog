@@ -41,10 +41,16 @@ PREVIEW_DATABASE_URL=postgresql://user:password@host:5432/preview_db
 NEXTAUTH_SECRET=your_super_secret_key_here
 NEXTAUTH_URL=https://your-domain.vercel.app
 
-# GitHub OAuth
-GITHUB_CLIENT_ID=your_github_oauth_client_id
-GITHUB_CLIENT_SECRET=your_github_oauth_client_secret
+# GitHub OAuth (注意：不能使用GITHUB_前缀!)
+OAUTH_GITHUB_CLIENT_ID=your_github_oauth_client_id
+OAUTH_GITHUB_CLIENT_SECRET=your_github_oauth_client_secret
 ```
+
+#### ⚠️ 重要提醒
+
+**GitHub 保留了 `GITHUB_` 前缀用作系统变量**，所以：
+- ❌ **不能使用**: `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` 
+- ✅ **必须使用**: `OAUTH_GITHUB_CLIENT_ID`, `OAUTH_GITHUB_CLIENT_SECRET`
 
 #### 🔒 可选的 Secrets
 
@@ -126,6 +132,11 @@ git push origin test-github-actions
 
 ## 🔧 常见问题排查
 
+### Q: "Input required and not supplied: GITHUB_CLIENT_ID"
+**解决方案**: 
+- 确认使用了正确的变量名称：`OAUTH_GITHUB_CLIENT_ID` 和 `OAUTH_GITHUB_CLIENT_SECRET`
+- GitHub 保留了 `GITHUB_` 前缀，必须使用其他名称
+
 ### Q: Vercel 部署失败
 - 检查 `VERCEL_TOKEN` 是否有效
 - 确认 `VERCEL_ORG_ID` 和 `VERCEL_PROJECT_ID` 正确
@@ -137,7 +148,7 @@ git push origin test-github-actions
 - 检查防火墙设置
 
 ### Q: GitHub OAuth 认证失败
-- 验证 `GITHUB_CLIENT_ID` 和 `GITHUB_CLIENT_SECRET`
+- 验证 `OAUTH_GITHUB_CLIENT_ID` 和 `OAUTH_GITHUB_CLIENT_SECRET`
 - 检查 OAuth 应用的回调 URL 设置
 - 确认域名配置正确
 

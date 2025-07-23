@@ -1,15 +1,13 @@
-name: PR Preview Deploy
+name: PR Preview
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
     branches: [ main, master ]
 
 jobs:
-  preview-deploy:
-    name: Deploy PR Preview
+  preview:
+    name: Deploy Preview
     runs-on: ubuntu-latest
-    if: github.event.pull_request.draft == false
     
     steps:
       - name: Checkout code
@@ -30,62 +28,69 @@ jobs:
       - name: Build application
         run: npm run build
         env:
-          DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL || secrets.DATABASE_URL }}
           NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
-          NEXTAUTH_URL: "https://blog-preview-${{ github.event.number }}.vercel.app"
-          GITHUB_CLIENT_ID: ${{ secrets.GITHUB_CLIENT_ID }}
-          GITHUB_CLIENT_SECRET: ${{ secrets.GITHUB_CLIENT_SECRET }}
+          NEXTAUTH_URL: "https://preview-${{ github.event.number }}-your-app.vercel.app"
+          GITHUB_CLIENT_ID: ${{ secrets.OAUTH_GITHUB_CLIENT_ID }}
+          GITHUB_CLIENT_SECRET: ${{ secrets.OAUTH_GITHUB_CLIENT_SECRET }}
 
       - name: Deploy to Vercel Preview
         uses: amondnet/vercel-action@v25
-        id: vercel-deploy
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-args: '--env NEXTAUTH_URL=https://preview-${{ github.event.number }}-your-app.vercel.app'
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          github-comment: true
-          vercel-args: '--meta githubCommitRef=${{ github.head_ref }}'
+          alias-domains: |
+            preview-${{ github.event.number }}-your-app.vercel.app
 
-      - name: Comment PR with preview URL
+      - name: Comment PR
         uses: actions/github-script@v7
         with:
           script: |
-            const { data: comments } = await github.rest.issues.listComments({
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: context.issue.number,
-            });
+              body: `## 🚀 Preview Deployment
+              
+              Your preview deployment is ready!
+              
+              🔗 **Preview URL**: https://preview-${{ github.event.number }}-your-app.vercel.app
+              
+              📝 **Changes in this PR will be automatically deployed to this preview URL.**
+              
+              ---
+              <sub>Powered by Vercel</sub>`
+            })
 
-            const botComment = comments.find(comment => 
-              comment.user.type === 'Bot' && 
-              comment.body.includes('Preview deployment')
-            );
+  database-preview:
+    name: Preview Database Setup
+    runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.labels.*.name, 'database-preview')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-            const previewUrl = '${{ steps.vercel-deploy.outputs.preview-url }}';
-            const commentBody = `## 🚀 Preview deployment
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
 
-            **Preview URL**: ${previewUrl}
+      - name: Install dependencies
+        run: npm ci
 
-            > This preview deployment will be available until the PR is closed.
-            
-            ### Changes included:
-            - ${{ github.event.pull_request.title }}
-            
-            ---
-            *Deployed with ❤️ by GitHub Actions*`;
+      - name: Generate Prisma client
+        run: npx prisma generate
 
-            if (botComment) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: botComment.id,
-                body: commentBody
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body: commentBody
-              });
-            } 
+      - name: Run preview database migrations
+        run: npx prisma migrate deploy
+        env:
+          DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }}
+
+      - name: Seed preview database
+        run: npm run db:seed
+        env:
+          DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_URL }} 

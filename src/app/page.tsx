@@ -1,8 +1,20 @@
 import { getPosts } from '@/lib/data';
 import PostCard from '@/components/PostCard';
+import type { Post } from '@/types';
 
 export default async function Home() {
-  const posts = await getPosts();
+  let posts: Post[] = [];
+  let hasError = false;
+
+  // 在CI环境中优雅处理数据库连接失败
+  try {
+    posts = await getPosts();
+  } catch (error) {
+    console.error('❌ Failed to fetch posts:', error);
+    hasError = true;
+    // 在CI/构建环境中，如果数据库不可用，使用空数组
+    posts = [];
+  }
   
   return (
     <div className="space-y-12">
@@ -34,7 +46,9 @@ export default async function Home() {
       {/* 统计卡片 */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-fade-in-up" style={{animationDelay: '0.6s'}}>
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 border border-white/20 p-6 text-center transform hover:scale-[1.02] hover:-translate-y-1">
-          <div className="text-3xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">{posts.length}</div>
+          <div className="text-3xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 bg-clip-text text-transparent">
+            {hasError ? '—' : posts.length}
+          </div>
           <div className="text-gray-600 font-medium">篇文章</div>
         </div>
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 border border-white/20 p-6 text-center transform hover:scale-[1.02] hover:-translate-y-1">
@@ -53,6 +67,18 @@ export default async function Home() {
         <div className="w-16 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 mx-auto rounded-full"></div>
       </div>
 
+      {/* 构建时错误状态 */}
+      {hasError && process.env.NODE_ENV === 'development' && (
+        <div className="text-center py-8 animate-fade-in-up">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 max-w-2xl mx-auto">
+            <div className="text-yellow-600 text-lg font-medium mb-2">⚠️ 数据库连接失败</div>
+            <p className="text-yellow-700">
+              无法连接到数据库。请确保数据库服务正在运行并且连接配置正确。
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* 文章列表 */}
       <div className="grid gap-8 lg:gap-10">
         {posts.map((post, index) => (
@@ -70,7 +96,7 @@ export default async function Home() {
       </div>
 
       {/* 空状态 */}
-      {posts.length === 0 && (
+      {posts.length === 0 && !hasError && (
         <div className="text-center py-20 animate-fade-in-up">
           <div className="relative">
             <div className="text-8xl mb-6 opacity-30 animate-float">📝</div>

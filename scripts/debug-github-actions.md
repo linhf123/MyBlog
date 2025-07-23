@@ -29,8 +29,8 @@ https://github.com/[username]/[repo]/actions
 ✅ DATABASE_URL
 ✅ NEXTAUTH_SECRET
 ✅ NEXTAUTH_URL
-✅ GITHUB_CLIENT_ID
-✅ GITHUB_CLIENT_SECRET
+✅ OAUTH_GITHUB_CLIENT_ID
+✅ OAUTH_GITHUB_CLIENT_SECRET
 ```
 
 #### ❌ **依赖安装失败**
@@ -138,13 +138,22 @@ echo "🎉 验证完成！"
 
 ### 2. 环境变量检查清单
 
+**本地开发环境** (`.env.local`):
 ```bash
-# 复制到你的 .env.local 文件
 DATABASE_URL="postgresql://..."
 NEXTAUTH_SECRET="..."
-NEXTAUTH_URL="..."
+NEXTAUTH_URL="http://localhost:3000"
 GITHUB_CLIENT_ID="..."
 GITHUB_CLIENT_SECRET="..."
+```
+
+**GitHub Secrets** (注意变量名差异):
+```bash
+DATABASE_URL=...
+NEXTAUTH_SECRET=...
+NEXTAUTH_URL=https://your-app.vercel.app
+OAUTH_GITHUB_CLIENT_ID=...
+OAUTH_GITHUB_CLIENT_SECRET=...
 ```
 
 ### 3. 最小化测试工作流

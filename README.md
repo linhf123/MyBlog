@@ -1,196 +1,180 @@
-# 我的博客
+# 个人博客项目
 
-一个使用 Next.js 15 构建的简洁博客系统，支持 GitHub 登录和评论功能。
+一个使用 Next.js 15、TypeScript、Prisma 和 PostgreSQL 构建的现代化博客系统。
 
-## 功能特性
+## ✨ 功能特性
 
-- 📝 博客文章展示
-- 💬 评论系统
-- 🔐 GitHub OAuth 登录
-- 📱 响应式设计
-- ⚡ Next.js 15 + TypeScript
+- 🚀 **现代化技术栈**: Next.js 15 + TypeScript + Prisma
+- 🎨 **美观界面**: Tailwind CSS + 响应式设计
+- 🔐 **GitHub OAuth**: 安全的用户认证系统
+- 💬 **评论系统**: 支持用户互动
+- 📱 **移动友好**: 完全响应式设计
+- 🔍 **代码高亮**: 支持多种编程语言
+- 🚀 **自动部署**: GitHub Actions + Vercel
+- 🛡️ **安全扫描**: 自动化安全检测
 
-## 技术栈
+## 🛠 技术栈
 
-- **前端框架**: Next.js 15
-- **语言**: TypeScript
-- **样式**: Tailwind CSS
-- **认证**: NextAuth.js
-- **数据库**: PostgreSQL + Prisma
+- **前端**: Next.js 15, React 19, TypeScript
+- **样式**: Tailwind CSS 4
+- **数据库**: PostgreSQL + Prisma ORM
+- **认证**: NextAuth.js v5
+- **部署**: Vercel
+- **CI/CD**: GitHub Actions
 
-## 快速开始
+## 🚀 快速开始
 
-1. **克隆项目**
-   ```bash
-   git clone <your-repo-url>
-   cd blog
-   ```
-
-2. **安装依赖**
-   ```bash
-   npm install
-   ```
-
-3. **配置 GitHub OAuth**
-   
-   a. 前往 [GitHub Settings > Developer settings > OAuth Apps](https://github.com/settings/applications/new)
-   
-   b. 创建新的 OAuth App:
-   - Application name: 你的博客名称
-   - Homepage URL: `http://localhost:3000`
-   - Authorization callback URL: `http://localhost:3000/api/auth/callback/github`
-   
-   c. 获取 Client ID 和 Client Secret
-
-4. **设置 PostgreSQL 数据库**
-   
-   a. 安装并启动 PostgreSQL
-   
-   b. 创建数据库：
-   ```sql
-   CREATE DATABASE blog_db;
-   ```
-
-5. **配置环境变量**
-   
-   复制环境变量模板：
-   ```bash
-   cp .env.example .env.local
-   ```
-   
-   编辑 `.env.local` 文件：
-   ```env
-   # 数据库连接
-   DATABASE_URL="postgresql://username:password@localhost:5432/blog_db?schema=public"
-   
-   # GitHub OAuth 配置
-   GITHUB_CLIENT_ID=your_github_client_id
-   GITHUB_CLIENT_SECRET=your_github_client_secret
-   
-   # NextAuth 配置
-   NEXTAUTH_URL=http://localhost:3000
-   NEXTAUTH_SECRET=your_nextauth_secret_key
-   ```
-
-6. **初始化数据库**
-   ```bash
-   # 生成 Prisma 客户端
-   npm run db:generate
-   
-   # 运行数据库迁移
-   npm run db:migrate
-   
-   # 初始化种子数据
-   npm run db:seed
-   ```
-
-7. **启动开发服务器**
-   ```bash
-   npm run dev
-   ```
-
-8. **访问应用**
-   
-   打开浏览器访问 [http://localhost:3000](http://localhost:3000)
-
-## 项目结构
-
-```
-src/
-├── app/                    # App Router 页面
-│   ├── api/               # API 路由
-│   │   ├── auth/          # NextAuth 配置
-│   │   ├── posts/         # 文章 API
-│   │   └── comments/      # 评论 API
-│   ├── posts/[id]/        # 文章详情页
-│   ├── layout.tsx         # 全局布局
-│   └── page.tsx           # 首页
-├── components/            # React 组件
-│   ├── Comments.tsx       # 评论组件
-│   ├── MarkdownRenderer.tsx # Markdown 渲染器
-│   ├── Navbar.tsx         # 导航栏
-│   ├── PostCard.tsx       # 文章卡片
-│   └── SessionProvider.tsx # 会话提供器
-├── lib/                   # 工具库
-│   ├── auth.ts           # NextAuth 配置
-│   ├── data.ts           # 数据访问层
-│   └── prisma.ts         # Prisma 客户端
-└── types/                 # TypeScript 类型定义
-    └── index.ts
+### 1. 克隆项目
+```bash
+git clone [your-repo-url]
+cd blog
 ```
 
-## 数据库管理
+### 2. 安装依赖
+```bash
+npm install
+```
 
-### 可用的数据库命令
+### 3. 环境配置
 
+创建 `.env.local` 文件：
+```bash
+# 数据库连接
+DATABASE_URL="postgresql://user:password@localhost:5432/blog_db"
+
+# NextAuth.js 配置
+NEXTAUTH_SECRET="your-secret-here"
+NEXTAUTH_URL="http://localhost:3000"
+
+# GitHub OAuth (本地开发使用标准变量名)
+GITHUB_CLIENT_ID="your_github_client_id"
+GITHUB_CLIENT_SECRET="your_github_client_secret"
+
+# 管理员配置 (可选)
+ADMIN_EMAILS="your-email@example.com"
+ADMIN_USER_IDS="github-user-id"
+```
+
+### 4. 数据库设置
 ```bash
 # 生成 Prisma 客户端
-npm run db:generate
+npx prisma generate
 
-# 运行数据库迁移（开发环境）
-npm run db:migrate
+# 运行数据库迁移
+npx prisma migrate dev
 
-# 推送架构到数据库（无迁移文件）
-npm run db:push
-
-# 初始化种子数据
+# (可选) 填充示例数据
 npm run db:seed
+```
 
-# 打开 Prisma Studio（数据库GUI）
-npm run db:studio
+### 5. 启动开发服务器
+```bash
+npm run dev
+```
+
+访问 [http://localhost:3000](http://localhost:3000) 查看你的博客！
+
+## 📝 环境变量说明
+
+### 本地开发环境 (`.env.local`)
+```bash
+DATABASE_URL="postgresql://user:password@localhost:5432/blog_db"
+NEXTAUTH_SECRET="your-secret-here"
+NEXTAUTH_URL="http://localhost:3000"
+GITHUB_CLIENT_ID="your_github_client_id"
+GITHUB_CLIENT_SECRET="your_github_client_secret"
+```
+
+### GitHub Actions Secrets
+由于GitHub保留了 `GITHUB_` 前缀，GitHub Actions中需要使用不同的变量名：
+```bash
+DATABASE_URL="your_production_database_url"
+NEXTAUTH_SECRET="your-secret-here"
+NEXTAUTH_URL="https://your-domain.vercel.app"
+OAUTH_GITHUB_CLIENT_ID="your_github_client_id"      # ⚠️ 注意变量名
+OAUTH_GITHUB_CLIENT_SECRET="your_github_client_secret"  # ⚠️ 注意变量名
+```
+
+## 🗄️ 数据库管理
+
+```bash
+# 数据库迁移
+npm run db:migrate
 
 # 重置数据库
 npm run db:reset
+
+# 查看数据库
+npm run db:studio
+
+# 推送 schema 变更
+npm run db:push
 ```
 
-### 添加新文章
+## 🚀 部署
 
-使用 Prisma Studio 或直接通过 API 添加新文章：
+### 使用 Vercel (推荐)
 
-```typescript
-// 通过 createPost 函数
-const newPost = await createPost({
-  title: '新文章标题',
-  content: '文章内容（支持 Markdown）',
-  excerpt: '文章摘要',
-  author: '作者名称',
-  userId: 'user_id' // 可选
-});
+1. **连接 GitHub 仓库**
+   - 前往 [Vercel Dashboard](https://vercel.com)
+   - 导入你的 GitHub 仓库
+
+2. **配置环境变量**
+   ```bash
+   DATABASE_URL=your_vercel_postgres_url
+   NEXTAUTH_SECRET=your_secret_here
+   NEXTAUTH_URL=https://your-domain.vercel.app
+   GITHUB_CLIENT_ID=your_github_client_id
+   GITHUB_CLIENT_SECRET=your_github_client_secret
+   ```
+
+3. **数据库配置**
+   - 在 Vercel 中创建 PostgreSQL 数据库
+   - 复制连接字符串到 `DATABASE_URL`
+
+### GitHub Actions 自动部署
+
+项目包含完整的 CI/CD 流水线：
+
+- ✅ **代码检查**: ESLint + TypeScript
+- ✅ **构建测试**: Next.js 构建验证
+- ✅ **安全扫描**: 依赖安全检查
+- ✅ **自动部署**: 推送到 main 分支自动部署
+- ✅ **PR 预览**: 每个 PR 都有预览环境
+
+配置说明请参考 [GitHub Actions 配置指南](./scripts/setup-github-actions.md)
+
+## 📚 项目结构
+
+```
+├── src/
+│   ├── app/                # App Router 页面
+│   ├── components/         # React 组件
+│   ├── lib/               # 工具库
+│   └── types/             # TypeScript 类型
+├── prisma/                # 数据库配置
+├── scripts/               # 脚本和文档
+└── .github/workflows/     # GitHub Actions
 ```
 
-### 数据库架构
+## 🤝 贡献指南
 
-项目使用以下数据模型：
-- **User**: 用户信息（NextAuth.js）
-- **Post**: 博客文章
-- **Comment**: 文章评论
-- **Account/Session**: 认证相关表
+1. Fork 项目
+2. 创建功能分支 (`git checkout -b feature/amazing-feature`)
+3. 提交更改 (`git commit -m 'Add amazing feature'`)
+4. 推送到分支 (`git push origin feature/amazing-feature`)
+5. 创建 Pull Request
 
-### 自定义样式
+## 📄 许可证
 
-项目使用 Tailwind CSS，你可以：
-- 修改 `src/app/globals.css` 全局样式
-- 在组件中调整 Tailwind 类名
-- 修改 `tailwind.config.ts` 配置
+本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
 
-## 部署
+## 🆘 获取帮助
 
-### Vercel 部署
+- 📖 [设置指南](./scripts/setup-github-actions.md)
+- 🐛 [故障排查](./scripts/debug-github-actions.md)
+- 💬 [提交 Issue](../../issues)
 
-1. 推送代码到 GitHub
-2. 连接 Vercel 账号到 GitHub
-3. 导入项目到 Vercel
-4. 配置环境变量
-5. 部署
+---
 
-### 其他平台
-
-确保配置正确的环境变量，特别是 `NEXTAUTH_URL` 要设置为生产环境的 URL。
-
-## 贡献
-
-欢迎提交 Issue 和 Pull Request！
-
-## 许可证
-
-MIT License
+⭐ 如果这个项目对你有帮助，请给个 Star 支持一下！

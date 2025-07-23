@@ -133,3 +133,127 @@ SNYK_TOKEN           # Snyk 安全扫描 Token
 3. **环境隔离**: 预览环境使用独立的数据库
 4. **安全扫描**: 建议启用 Snyk 获得更好的安全检测
 5. **分支保护**: 建议为 main 分支启用保护规则 
+
+# GitHub Actions 环境变量配置
+
+本文档列出了所有需要在 GitHub Secrets 中配置的环境变量。
+
+## 🔑 必需的 Secrets
+
+前往你的 GitHub 仓库 → **Settings** → **Secrets and variables** → **Actions**，添加以下 Secrets：
+
+### 🚀 Vercel 部署
+```bash
+VERCEL_TOKEN           # Vercel 部署 Token
+VERCEL_ORG_ID          # Vercel 组织 ID
+VERCEL_PROJECT_ID      # Vercel 项目 ID
+```
+
+### 🗄️ 数据库
+```bash
+DATABASE_URL           # 生产环境数据库连接字符串
+```
+
+### 🔐 认证配置
+```bash
+NEXTAUTH_SECRET        # NextAuth.js 会话加密密钥
+NEXTAUTH_URL           # 生产环境 URL
+```
+
+### 👤 GitHub OAuth
+⚠️ **重要提醒**: GitHub 保留了 `GITHUB_` 前缀，所以必须使用以下变量名：
+```bash
+OAUTH_GITHUB_CLIENT_ID      # GitHub OAuth 客户端 ID
+OAUTH_GITHUB_CLIENT_SECRET  # GitHub OAuth 客户端密钥
+```
+
+❌ **不能使用**: `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`
+✅ **必须使用**: `OAUTH_GITHUB_CLIENT_ID`, `OAUTH_GITHUB_CLIENT_SECRET`
+
+## 🔹 可选的 Secrets
+
+```bash
+PREVIEW_DATABASE_URL   # PR 预览环境数据库（可选）
+SNYK_TOKEN            # Snyk 安全扫描 Token（可选）
+ADMIN_EMAILS          # 管理员邮箱列表（可选）
+ADMIN_USER_IDS        # 管理员用户ID列表（可选）
+```
+
+## 📋 获取各项配置的方法
+
+### 🔗 Vercel 配置
+```bash
+# 安装 Vercel CLI
+npm i -g vercel
+
+# 登录并连接项目
+vercel login
+vercel link
+
+# 获取项目信息
+cat .vercel/project.json
+
+# 获取 Token: https://vercel.com/account/tokens
+```
+
+### 🗄️ 数据库连接
+- **Vercel Postgres**: Dashboard → Storage → Postgres → Connect → Prisma
+- **Supabase**: Dashboard → Settings → Database → Connection String
+- **PlanetScale**: Dashboard → Connect → Prisma
+- **Railway**: Dashboard → PostgreSQL → Connect → Prisma URL
+
+### 🔐 NextAuth Secret
+```bash
+# 生成随机密钥
+openssl rand -base64 32
+```
+
+### 👤 GitHub OAuth 应用
+1. 前往 [GitHub Settings](https://github.com/settings/developers) → **OAuth Apps**
+2. 创建新应用：
+   - **Application name**: `你的博客名称`
+   - **Homepage URL**: `https://your-domain.vercel.app`
+   - **Authorization callback URL**: `https://your-domain.vercel.app/api/auth/callback/github`
+3. 获取 Client ID 和 Client Secret
+
+### 🛡️ Snyk Token (可选)
+1. 注册 [Snyk](https://snyk.io/)
+2. 前往 Account Settings → General → Auth Token
+
+## 🔍 验证配置
+
+配置完成后，创建测试 PR 验证：
+
+```bash
+git checkout -b test-github-actions
+echo "# Test" >> test.md
+git add test.md
+git commit -m "test: GitHub Actions configuration"
+git push origin test-github-actions
+```
+
+应该看到：
+- ✅ CI 检查通过
+- ✅ 安全扫描通过
+- ✅ 部署成功
+- 🔗 预览链接可访问
+
+## 🚨 常见问题
+
+### "Input required and not supplied"
+- 检查 Secret 名称拼写是否正确
+- 确认使用了正确的 OAuth 变量名
+
+### "Authentication failed"
+- 验证 Token 是否有效
+- 检查权限和过期时间
+
+### "Database connection failed"
+- 验证 DATABASE_URL 格式
+- 确认数据库服务可访问
+
+## 📖 相关文档
+
+- [完整设置指南](../scripts/setup-github-actions.md)
+- [故障排查指南](../scripts/debug-github-actions.md)
+- [管理员配置](../ADMIN_CONFIG.md) 
