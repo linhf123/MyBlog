@@ -7,11 +7,37 @@ import Navbar from "@/components/Navbar";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
+  fallback: [
+    "-apple-system",
+    "BlinkMacSystemFont", 
+    "Segoe UI",
+    "Roboto",
+    "Oxygen",
+    "Ubuntu",
+    "Cantarell",
+    "Fira Sans",
+    "Droid Sans",
+    "Helvetica Neue",
+    "sans-serif"
+  ],
+  adjustFontFallback: false, // 禁用自动字体回退调整
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
+  fallback: [
+    "SFMono-Regular",
+    "Menlo",
+    "Monaco",
+    "Consolas",
+    "Liberation Mono",
+    "Courier New",
+    "monospace"
+  ],
+  adjustFontFallback: false, // 禁用自动字体回退调整
 });
 
 export const metadata: Metadata = {
@@ -27,7 +53,7 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-mesh min-h-screen`}
+        className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased bg-gradient-mesh min-h-screen`}
       >
         <div className="fixed inset-0 bg-gradient-to-br from-blue-50/80 via-indigo-50/80 to-purple-50/80 pointer-events-none"></div>
         <SessionProvider>

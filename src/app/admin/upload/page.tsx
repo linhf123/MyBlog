@@ -21,6 +21,7 @@ export default function UploadPage() {
         try {
           const response = await fetch('/api/auth/check-admin');
           const result = await response.json();
+          console.log('result', result);
           setIsAdmin(result.isAdmin);
         } catch (error) {
           console.error('Error checking admin status:', error);

@@ -30,6 +30,7 @@ export function isAdmin(userEmail: string | null | undefined, userId: string | n
   const adminEmails = process.env.ADMIN_EMAILS?.split(',').map(email => email.trim()) || [];
   const adminUserIds = process.env.ADMIN_USER_IDS?.split(',').map(id => id.trim()) || [];
   
+  console.log('adminEmails', userEmail, adminEmails);
   // 检查邮箱是否在管理员列表中
   if (userEmail && adminEmails.includes(userEmail)) {
     return true;
@@ -46,6 +47,7 @@ export function isAdmin(userEmail: string | null | undefined, userId: string | n
 // 服务端检查当前用户是否为管理员
 export async function isCurrentUserAdmin(): Promise<boolean> {
   const session = await auth();
+  console.log('session', session);
   if (!session?.user) return false;
   
   return isAdmin(session.user.email, session.user.id);
